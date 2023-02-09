@@ -7,6 +7,12 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 
+use App\Mail\ResetPassword;
+use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
+use Bitfumes\Multiauth\Model\Admin;
+use Auth;
+
 class ForgotPasswordController extends Controller
 {
     /*
@@ -48,6 +54,33 @@ class ForgotPasswordController extends Controller
     public function broker()
     {
         return Password::broker('admins');
+    }
+
+    public function sendResetLinkEmail(Request $request)
+    {
+
+
+        $this->validateEmail($request);
+
+        // Stores New Password
+        $password = generate_password();
+
+        //Sends email to the user with the currect password
+        Mail::to($request->email)->send(new ResetPassword($password));
+
+        //Updates Password
+        $admin = Admin::where('email', $request->email)->first();
+
+        $admin->password = bcrypt($password);
+        $admin->password_changed_at = Carbon::now()->toDateTimeString();
+        $admin->save();
+
+        //Logs user out
+        Auth::logout();
+
+        //Redirects to login page
+        return redirect()->route('admin')->with('success', 'Password changed successfully');
+
     }
 
     /**

@@ -33,7 +33,7 @@
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary btn-sm">Store</button>
-                        <a href="{{ route('admin.roles') }}" class="btn btn-sm btn-danger float-right">Back</a>
+                        <a href="{{ route('admin.roles') }}" class="btn btn-sm btn-dangerfloat-end">Back</a>
                     </form>
                 </div>
             </div>

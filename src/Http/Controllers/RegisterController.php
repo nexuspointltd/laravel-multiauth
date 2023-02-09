@@ -4,10 +4,14 @@ namespace Bitfumes\Multiauth\Http\Controllers;
 
 use Bitfumes\Multiauth\Model\Role;
 use Illuminate\Routing\Controller;
+use Bitfumes\Multiauth\Model\Admin;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Bitfumes\Multiauth\Http\Requests\AdminRequest;
 use Bitfumes\Multiauth\Notifications\RegistrationNotification;
+
+
+use App\Models\Dealership;
 
 class RegisterController extends Controller
 {
@@ -44,15 +48,18 @@ class RegisterController extends Controller
     public function __construct()
     {
         $this->middleware('auth:admin');
-        $this->middleware('role:super');
+        $this->middleware('role:super;super-admin');
         $this->adminModel = config('multiauth.models.admin');
         $this->roleModel  = config('multiauth.models.role');
     }
 
     public function showRegistrationForm()
     {
-        $roles = $this->roleModel::all();
-        return view('multiauth::admin.register', compact('roles'));
+        //$roles = $this->roleModel::all();
+        $dealerships =  Dealership::all();
+        $roles = Role::orderBy('name', 'ASC')->get();
+        return view('multiauth::admin.register', compact('roles', 'dealerships'));
+
     }
 
     public function register(AdminRequest $request)
@@ -71,7 +78,9 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $admin = new $this->adminModel();
+
+        //$admin = new $this->adminModel();
+        $admin = new Admin();
 
         $fields           = $this->tableFields();
         $data['password'] = bcrypt($data['password']);
@@ -104,28 +113,42 @@ class RegisterController extends Controller
         return collect(\Schema::getColumnListing('admins'));
     }
 
-    public function edit($adminId)
+    public function edit(Admin $admin)
     {
-        $admin = $this->adminModel::findOrFail($adminId);
-        $roles = Role::all();
+       // $admin = $this->adminModel::findOrFail($adminId);
+        $dealerships = Dealership::orderBy('name', 'ASC')->get();
+        $roles = Role::orderBy('name', 'ASC')->get();
 
-        return view('multiauth::admin.edit', compact('admin', 'roles'));
+        return view('multiauth::admin.edit', compact('admin', 'roles', 'dealerships'));
     }
 
-    public function update($adminId, AdminRequest $request)
+    public function update(Admin $admin, AdminRequest $request)
     {
-        $admin             = $this->adminModel::findOrFail($adminId);
+
+
+        $request->validate([
+            'dealership_id'             => 'required',
+            'role_id'                   => 'required',
+        ],
+        [
+            'dealership_id.required' => 'You need to select minimum (1) Dealership',
+            'role_id.required' => 'You need to select minimum (1) Role'
+        ]);
+
+        //$admin             = $this->adminModel::findOrFail($adminId);
         $request['active'] = request('activation') ?? 0;
         unset($request['activation']);
         $admin->update($request->except('role_id'));
         $admin->roles()->sync(request('role_id'));
+        $admin->dealerships()->sync(request('dealership_id'));
 
         return redirect(route('admin.show'))->with('message', "{$admin->name} details are successfully updated");
     }
 
-    public function destroy($adminId)
+
+    public function destroy(Admin $admin)
     {
-        $admin  = $this->adminModel::findOrFail($adminId);
+       // $admin  = $this->adminModel::findOrFail($adminId);
         $prefix = config('multiauth.prefix');
         $admin->delete();
 

@@ -7,6 +7,8 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
+use App\Models\Wallpaper;
+
 class LoginController extends Controller
 {
     /*
@@ -47,9 +49,12 @@ class LoginController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
+
     public function showLoginForm()
     {
-        return view('multiauth::admin.login');
+        $wallpaper  =   Wallpaper::where('name', 'admin')->first();
+        return  view('multiauth::admin.login')
+                    ->with('wallpaper', $wallpaper);
     }
 
     /**

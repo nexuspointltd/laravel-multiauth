@@ -4,6 +4,8 @@ namespace Bitfumes\Multiauth\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Bitfumes\Multiauth\Model\Admin;
+use Bitfumes\Multiauth\Model\Role;
 
 class RoleController extends Controller
 {
@@ -61,5 +63,13 @@ class RoleController extends Controller
         $role->delete();
 
         return redirect()->back()->with('message', 'You have deleted Role successfully');
+    }
+
+    public function delete($id)
+    {
+        $role = Role::find($id);
+        $role->delete();
+        return redirect()->back()->with('success', 'You have deleted Role successfully');
+
     }
 }

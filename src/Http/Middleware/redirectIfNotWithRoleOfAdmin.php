@@ -33,7 +33,8 @@ class redirectIfNotWithRoleOfAdmin
         $match = count(array_intersect($given_role, $roles->toArray()));
 
         if (!$match) {
-            return redirect(route('admin.home'));
+           // return redirect(route('admin.home'));
+            return redirect('/dashboard');
         }
 
         return $next($request);

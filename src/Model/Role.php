@@ -4,6 +4,8 @@ namespace Bitfumes\Multiauth\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
+use DB;
+
 class Role extends Model
 {
     protected static function boot()
@@ -21,8 +23,7 @@ class Role extends Model
 
     public function admins()
     {
-        $adminModel = config('multiauth.models.admin');
-        return $this->belongsToMany($adminModel);
+        return $this->belongsToMany(Admin::class);
     }
 
     public function permissions()
@@ -58,4 +59,16 @@ class Role extends Model
     {
         $this->attributes['name'] = strtolower($name);
     }
+
+
+    public function getRoles($id) {
+        $roles = DB::table('admin_role')
+                    ->join('roles', 'roles.id', '=', 'admin_role.role_id')
+                    ->select('roles.name', 'admin_role.role_id')
+                    ->where('admin_role.admin_id',   $id )
+                    ->get();
+
+        return $roles;
+    }
+
 }

@@ -1,4 +1,4 @@
-@extends('multiauth::layouts.app') 
+@extends('multiauth::layouts.app')
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
@@ -63,7 +63,7 @@
                                     Register
                                 </button>
 
-                                <a href="{{ route('admin.show') }}" class="btn btn-danger btn-sm float-right">
+                                <a href="{{ route('admin.show') }}" class="btn btn-danger btn-smfloat-end">
                                     Back
                                 </a>
                             </div>

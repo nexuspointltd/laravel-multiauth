@@ -4,7 +4,11 @@ namespace Bitfumes\Multiauth\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Bitfumes\Multiauth\Model\Admin;
+use Bitfumes\Multiauth\Model\Role;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
+use DB;
 
 class AdminController extends Controller
 {
@@ -18,20 +22,64 @@ class AdminController extends Controller
     public function __construct()
     {
         $this->middleware('auth:admin');
-        $this->middleware('role:super', ['only'=>'show']);
-        $this->adminModel = config('multiauth.models.admin');
+        $this->middleware('role:super;super-admin');
+        //$this->adminModel = config('multiauth.models.admin');
     }
 
     public function index()
     {
-        return view('multiauth::admin.home');
+        return redirect('/dashboard');
+        //return view('multiauth::admin.home');
+    }
+
+     //Fetchs data of search results
+    public function fetchData(Request $request){
+       // return $request->all();
+
+            $roles = new Role;
+            $terms = explode(' ', request('keyword'));
+            $admins   = DB::table('admin_role')
+                                ->join('roles', 'roles.id', '=', 'admin_role.role_id')
+                                ->join('admins', 'admins.id', '=', 'admin_role.admin_id')
+                                ->select('admins.active', 'admins.last_login_at', 'admins.name', 'admins.email', 'admins.id', 'admin_role.role_id', 'roles.name AS role_name')
+                                ->where(function($query) use ($terms){
+                                    foreach($terms as $term){
+                                        $query->where('admins.name', 'LIKE', "%{$term}%")
+                                                ->orWhere('admins.email', 'LIKE', '%' . $term . '%')
+                                                ->orWhere('roles.name', 'LIKE', '%' . $term . '%');
+                                    }
+                                })
+                                ->groupBy('admins.email')
+                                ->orderBy('admins.name', 'ASC')
+                                ->paginate(15);
+
+
+
+            $message    = "<i class='far fa-meh fs-180'></i> We're Sorry but no results were found, please try again.";
+            return view('vendor.multiauth.admin._results')
+                            ->with('admins', $admins)
+                            ->with('message', $message)
+                            ->with('roles', $roles)
+                            ->render();
+
     }
 
     public function show()
     {
-        $admins = $this->adminModel::where('id', '!=', auth()->id())->get();
+        //$admins = Admin::where('id', '!=', auth()->id())->get();
 
-        return view('multiauth::admin.show', compact('admins'));
+       $admins = Admin::where('id', '!=', auth()->id())
+                        ->groupBy('admins.email')
+                        ->orderBy('admins.name', 'ASC')
+                        ->paginate(15);
+
+        $roles      = new Role;
+        $message    = "Customers data is currently empty!";
+        //dd($admins);
+        return view('multiauth::admin.show')
+                ->with('admins', $admins)
+                ->with('roles', $roles)
+                ->with('message', $message);
     }
 
     public function showChangePasswordForm()
@@ -47,6 +95,16 @@ class AdminController extends Controller
         ]);
         auth()->user()->update(['password' => bcrypt($data['password'])]);
 
-        return redirect(route('admin.home'))->with('message', 'Your password is changed successfully');
+        return redirect(route('admin.home'))->with('success', 'Your password was changed successfully');
+    }
+
+    public function delete($id)
+    {
+
+        $admin = Admin::find($id);
+        $pivot = DB::table('admin_dealership')->where('admin_id', $admin->id)->delete();
+        $admin->delete();
+        return redirect('/admin/show')->with('success', 'Admin [' .$admin->name. '] has been deleted!');
+
     }
 }

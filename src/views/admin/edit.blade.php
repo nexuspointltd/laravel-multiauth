@@ -3,7 +3,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">Edit details of {{$admin->name}}</div>
+                <div class="card-header">Edit details of {{$admin->name}} </div>
 
                 <div class="card-body">
                     @include('multiauth::message')
@@ -25,18 +25,18 @@
                             <select name="role_id[]" id="role_id" class="form-control col-md-6 {{ $errors->has('role_id') ? ' is-invalid' : '' }}" multiple>
                                 <option selected disabled>Select Role</option>
                                 @foreach ($roles as $role)
-                                    <option value="{{ $role->id }}" 
-                                        @if (in_array($role->id,$admin->roles->pluck('id')->toArray())) 
-                                            selected 
+                                    <option value="{{ $role->id }}"
+                                        @if (in_array($role->id,$admin->roles->pluck('id')->toArray()))
+                                            selected
                                         @endif >{{ $role->name }}
                                     </option>
                                 @endforeach
-                            </select> 
+                            </select>
 
                             @if ($errors->has('role_id'))
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $errors->first('role_id') }}</strong>
-                                </span> 
+                                </span>
                             @endif
                         </div>
 
@@ -50,7 +50,7 @@
                                 <button type="submit" class="btn btn-sm btn-primary">
                                     Change
                                 </button>
-                                <a href="{{ route('admin.show') }}" class="btn btn-danger btn-sm float-right">Back</a>
+                                <a href="{{ route('admin.show') }}" class="btn btn-danger btn-smfloat-end">Back</a>
                             </div>
                         </div>
                     </form>

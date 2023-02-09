@@ -53,7 +53,7 @@ class MakeMultiAuthCommand extends Command
         $this->addGuard()
             ->publishControllers()
             ->publishRoutes()
-            ->registerRoutes()
+            //->registerRoutes()
             ->loadViews()
             ->publishFactory()
             ->publishMigration()

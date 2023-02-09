@@ -6,10 +6,11 @@ use Illuminate\Notifications\Notifiable;
 use Bitfumes\Multiauth\Traits\hasPermissions;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Bitfumes\Multiauth\Notifications\AdminResetPasswordNotification;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class Admin extends Authenticatable
 {
-    use Notifiable, hasPermissions;
+    use Notifiable, hasPermissions, TwoFactorAuthenticatable;
 
     protected $casts = ['active' => 'boolean'];
 
@@ -17,6 +18,12 @@ class Admin extends Authenticatable
     {
         $role = config('multiauth.models.role');
         return $this->belongsToMany($role);
+    }
+
+    /**/
+    public function dealerships()
+    {
+        return $this->belongsToMany("App\Models\Dealership");
     }
 
     /**

@@ -34,7 +34,7 @@
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary btn-sm">Change</button>
-                        <a href="{{ route('admin.roles') }}" class="btn btn-danger btn-sm float-right">Back</a>
+                        <a href="{{ route('admin.roles') }}" class="btn btn-danger btn-smfloat-end">Back</a>
                     </form>
                 </div>
             </div>
