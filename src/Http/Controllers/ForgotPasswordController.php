@@ -45,6 +45,7 @@ class ForgotPasswordController extends Controller
      */
     public function showLinkRequestForm()
     {
+
         return view('multiauth::admin.passwords.email');
     }
 
@@ -56,32 +57,32 @@ class ForgotPasswordController extends Controller
         return Password::broker('admins');
     }
 
-    public function sendResetLinkEmail(Request $request)
-    {
+    // public function sendResetLinkEmail(Request $request)
+    // {
 
 
-        $this->validateEmail($request);
+    //     $this->validateEmail($request);
 
-        // Stores New Password
-        $password = generate_password();
+    //     // Stores New Password
+    //     $password = generate_password();
 
-        //Sends email to the user with the currect password
-        Mail::to($request->email)->send(new ResetPassword($password));
+    //     //Sends email to the user with the currect password
+    //     Mail::to($request->email)->send(new ResetPassword($password));
 
-        //Updates Password
-        $admin = Admin::where('email', $request->email)->first();
+    //     //Updates Password
+    //     $admin = Admin::where('email', $request->email)->first();
 
-        $admin->password = bcrypt($password);
-        $admin->password_changed_at = Carbon::now()->toDateTimeString();
-        $admin->save();
+    //     $admin->password = bcrypt($password);
+    //     $admin->password_changed_at = Carbon::now()->toDateTimeString();
+    //     $admin->save();
 
-        //Logs user out
-        Auth::logout();
+    //     //Logs user out
+    //     Auth::logout();
 
-        //Redirects to login page
-        return redirect()->route('admin')->with('success', 'Password changed successfully');
+    //     //Redirects to login page
+    //     return redirect()->route('admin')->with('success', 'Password changed successfully');
 
-    }
+    // }
 
     /**
      * @param Request $request
