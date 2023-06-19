@@ -24,6 +24,7 @@ class AdminController extends Controller
         $this->middleware('auth:admin');
         $this->middleware('role:super;super-admin;admin');
         //$this->adminModel = config('multiauth.models.admin');
+        
     }
 
     public function index()
